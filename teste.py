@@ -18,36 +18,38 @@ cursor = mydb.cursor()
 #Resumindo, é a ÚNICA parte do código que iramos mexer, por enquanto
 cursor.execute("CREATE DATABASE INFORMA_MAIS")
 
+cursor.execute("USE INFORMA_MAIS")
+
 cursor.execute("CREATE TABLE Relato (
                Descricao VARCHAR(100) NOT NULL,
                ID_Relato INTEGER NOT NULL, 
                Data DATETIME NOT NULL, 
                Status BIT NOT NULL, 
-               PRIMARY KEY(ID_Relato))")
+               PRIMARY KEY(ID_Relato)) ENGINE=InnoDB")
 
 cursor.execute("CREATE TABLE Midia (
                ID_Relato INTEGER, 
                Foto BLOB, 
-               Video BLOB)")
+               Video BLOB) ENGINE=InnoDB")
 
 cursor.execute("CREATE TABLE Problema (
                ID_Relato INTEGER NOT NULL, 
                Categoria VARCHAR(20) NOT NULL, 
                Subcategoria VARCHAR(20) NOT NULL, 
-               PRIMARY KEY(Categoria))")
+               PRIMARY KEY(Categoria)) ENGINE=InnoDB")
 
 cursor.execute("CREATE TABLE Localizacao (
                ID_Relato INTEGER NOT NULL, 
                Rua VARCHAR(15) NOT NULL, 
                Bairro VARCHAR(20) NOT NULL, 
                Cidade VARCHAR(15) NOT NULL, 
-               CEP VARCHAR(10) NOT NULL)")
+               CEP VARCHAR(10) NOT NULL) ENGINE=InnoDB")
 
-cursor.execute("CREATE TABLE Prestador de Serviços Publicos (
+cursor.execute("CREATE TABLE Funcionario_Publico (
                nome VARCHAR(30) NOT NULL, 
                Orgao_empresa VARCHAR(15) NOT NULL, 
                ID_Funcionario INTEGER NOT NULL, 
-               PRIMARY KEY(ID_Funcionario))")
+               PRIMARY KEY(ID_Funcionario)) ENGINE=InnoDB")
 
 cursor.execute("CREATE TABLE Endereco (
                email_cidadao VARCHAR(35) NOT NULL, 
@@ -55,7 +57,7 @@ cursor.execute("CREATE TABLE Endereco (
                Bairro VARCHAR(20) NOT NULL, 
                Cidade VARCHAR(15) NOT NULL, 
                CEP VARCHAR(10) NOT NULL, 
-               Numero VARCHAR(4) NOT NULL)")
+               Numero VARCHAR(4) NOT NULL) ENGINE=InnoDB")
 
 cursor.execute("CREATE TABLE Cidadao (
                nome VARCHAR(30) NOT NULL, 
@@ -64,7 +66,17 @@ cursor.execute("CREATE TABLE Cidadao (
                data_nascimento DATE NOT NULL, 
                telefone VARCHAR(12) NOT NULL, 
                ID_Relato INTEGER NOT NULL, 
-               PRIMARY KEY(email))")
+               PRIMARY KEY(email)) ENGINE=InnoDB")
+
+cursor.execute("ALTER TABLE Cidadao ADD CONSTRAINT FK_Cidadao_Relato FOREIGN KEY (ID_Relato) REFERENCES Relato (ID_Relato)")
+
+cursor.execute("ALTER TABLE Problema ADD CONSTRAINT FK_Problema_Relato FOREIGN KEY (ID_Relato) REFERENCES Relato (ID_Relato)")
+
+cursor.execute("ALTER TABLE Endereco ADD CONSTRAINT FK_Endereco_Cidadao FOREIGN KEY (email_cidadao) REFERENCES Cidadao (email)")
+
+cursor.execute("ALTER TABLE Midia ADD CONSTRAINT FK_Midia_Relato FOREIGN KEY (ID_Relato) REFERENCES Relato (ID_Relato)")
+
+cursor.execute("ALTER TABLE Localizacao ADD CONSTRAINT FK_Localizacao_Relato FOREIGN KEY (ID_Relato) REFERENCES Relato (ID_Relato)")
 
 
 
