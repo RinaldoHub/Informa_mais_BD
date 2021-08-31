@@ -6,7 +6,7 @@ mydb = mysql.connector.connect(
    host = "localhost",
    user = "root",
    password = "",
-   database = "cadastro"
+   database = ""
 )
 
 #O cursor precisa ser criado para que possamos executar os códigos SQL no Python
