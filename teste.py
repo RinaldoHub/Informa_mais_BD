@@ -1,5 +1,8 @@
 import mysql.connector #Importamos o concector MySQL que implementa o Banco
 
+import datetime
+
+
 #Aqui vai as credenciais do nosso banco. Isso varia entre as máquinas, então por enquanto não foquemos aqui
 #e sim nos códigos SQL
 mydb = mysql.connector.connect(
@@ -11,7 +14,7 @@ mydb = mysql.connector.connect(
 
 #O cursor precisa ser criado para que possamos executar os códigos SQL no Python
 #Lembra bastante os Objetos em Java.
-cursor = mydb.cursor()
+cursor = mydb.cursor(prepared=True)
 
 #O código de DDL está COMENTADO para não haver duplicidade ou erro nos testes
 """
@@ -90,8 +93,150 @@ cursor.execute("INSERT INTO Cidadao VALUES(0, 'Jose', 'jose@email.com', 'jose123
 
 #TELA DE INTRODUÇÃO e decoração pro código
 print("########## CONSOLE MYSQL ##########\nPara sair, digite -1\n")
-print("BANCO DE DADOS ATIVO: {0}\nUSUÁRIO: {1}\n".format(mydb.database, mydb.user))
+print("BANCO DE DADOS ATIVO: %s\nUSUÁRIO: %s\n" % (mydb.database, mydb.user))
+"""
+#TELA PRINCIPAL
+def MenuLogin():
+   print("------------------------------------\n")
+   print("########## TELA PRINCIPAL ##########")
+   print("1 - LOGIN\n2 - CADASTRAR\n")
+   numero = input("O que deseja?\n")
 
+   if(numero == '1'):
+      Login()
+
+   elif(numero == '2'):
+      Cadastrar()
+
+   #elif(numero == '3'): break
+
+   elif(numero != 1 or 2 or 3):
+      print("ESCOLHA UMA OPÇÃO VÁLIDA")
+
+def Login():
+   print("------------------------------------\n")
+   print("########## TELA DE LOGIN ##########")
+   user = input("Digite seu Username:")
+   senha = input("Digite sua Senha: ")
+   print("ACESSO AUTORIZADO")
+   MenuPrincipal()
+
+def Cadastrar():
+   print("------------------------------------\n")
+   print("########## TELA DE CADASTRO ##########")
+   user = input("Digite seu Username:")
+   senha = input("Digite sua Senha: ")
+   print("ACESSO AUTORIZADO")
+   MenuPrincipal()
+"""
+
+"""
+#FUNÇÃO DA TABELA
+def MenuPrincipal():
+   while True:
+      try:
+         print("------------------------------------\n")
+         print("########## MENU PRINCIPAL ##########")
+         print("1 - MOSTRAR TABELAS\n2 - INSERIR DADOS NA TABELA\n3 - PESQUISAR\n4 - SAIR\n")
+         numero = input("O que deseja?\n")
+
+         #MOSTRAR TABELAS
+         if (numero == '1'):
+            cursor.execute("SHOW TABLES")
+            for x in cursor:  # O for faz uma varredura no comando do input e printa o que resgatou
+               print(x)
+
+         #cadeia de if para INSERÇÃO DE DADOS
+         elif (numero == '2'):
+            print("1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4\
+             - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n7 - MIDIA\n")
+            tabela = input('Qual TABELA deseja INSERIR DADOS?\n')
+            if tabela == '1':
+               a = input("Descrição:")
+               b = input("Data: (DD/MM/AA)")
+               c = input("Status: (PENDENTE, PUBLICADO, DESATIVADO OU RESOLVIDO)")
+               sql = "INSERT INTO RELATO(descricao, data, status) VALUES(%a, %a, %a)"
+               val = (a, b, c)
+               cursor.execute(sql % val)
+               mydb.commit()
+               cursor.execute("select * from relato")
+               for x in cursor:
+                  print(x)
+            elif tabela == '2':
+               a = input("Nome:")
+               b = input("Data de Nascimento: (DD/MM/AA)")
+               c = input("Telefone: (xx)9xxxx-xxxx")
+               d = input("E-Mail:")
+               e = input("Senha:")
+               sql = "INSERT INTO CIDADAO(nome, data_nascimento, telefone, email, senha) VALUES(%a, %a, %a, %a, %a)"
+               val = (a,b,c,d,e)
+               cursor.execute(sql % val)
+               mydb.commit()
+            elif tabela == '3':
+               a = input("Nome:")
+               b = input("Órgão/Empresa: ")
+               c = input("E-Mail Institucional:")
+               d = input("Senha:")
+               sql = "INSERT INTO FUNCIONARIO_PUBLICO(nome, orgao_empresa, email_institucional, senha) VALUES(%a, %a, %a, %a)"
+               val = (a,b,c,d)
+               cursor.execute(sql % val)
+               mydb.commit()
+            elif tabela == '4':
+               a = input("CEP: (xxxxx-xxx)")
+               b = input("Cidade: ")
+               c = input("Bairro:")
+               d = input("Rua:")
+               e = input("Número:")
+               sql = "INSERT INTO ENDERECO(cep, cidade, bairro, rua, numero) VALUES(%s, %a, %a, %a, %a, %a)"
+               val = (a,b,c,d,e,)
+               cursor.execute(sql % val)
+               mydb.commit()
+            elif tabela == '5':
+               a = input("CEP: (xxxxx-xxx)")
+               b = input("Cidade: ")
+               sql = "INSERT INTO PROBLEMA(categoria, subcategoria) VALUES(%a, %a)"
+               val = (a,b)
+               cursor.execute(sql % val)
+               mydb.commit()
+            elif tabela == '6':
+               a = input("Rua:")
+               b = input("Bairro:")
+               c = input("Cidade:")
+               d = input("CEP: (xxxxx-xxx)")
+               sql = "INSERT INTO LOCALIZACAO(rua, bairro, cidade, cep)"
+               val = (a,b,c,d)
+               cursor.execute(sql % val)
+               mydb.commit()
+                
+            print(cursor.rowcount,"Dado(s) INSERIDO(s)!")
+
+         elif (numero == '3'):
+            tabela = input('Em qual TABELA deseja PESQUISAR?\n')
+         elif (numero == '4'):
+            break
+         MenuPrincipal()
+      except:
+         pass
+"""
+
+#Como o DATETIME funciona
+a = datetime.datetime.now().isoformat()
+print(a)
+sql = "INSERT INTO RELATO(data) VALUES(%a)"
+
+val = (a)
+cursor.execute(sql % val)
+mydb.commit()
+cursor.execute("select * from relato")
+for x in cursor:
+   print(x)
+
+
+#ORDEM DE MENUS
+#MenuLogin()
+#MenuPrincipal()
+
+"""
 #Aqui está a INTERAÇÃO COM O USUÁRIO
 while True:
    try: #O try é utilizado para "tentar" executar o código
@@ -104,4 +249,4 @@ while True:
          print(x)
    except: #E caso o código haja erros de sintaxe, ele avisa e volta para o começo do loop
       print("***ERRO DE SINTAXE SQL***")
-      pass
+      pass"""
