@@ -71,7 +71,7 @@ cursor.execute("CREATE TABLE Cidadao (\
               data_nascimento DATE NOT NULL,\
               telefone VARCHAR(12) NOT NULL,\
               ID_Relato INTEGER NOT NULL,\
-              PRIMARY KEY(id)) ENGINE=InnoDB")
+              PRIMARY KEY(id_cidadao)) ENGINE=InnoDB")
 
 #Aqui está a CIRAÇÃO DAS FOREIGN KEYS
 cursor.execute("ALTER TABLE Cidadao ADD CONSTRAINT FK_Cidadao_Relato FOREIGN KEY (ID_Relato) REFERENCES Relato (ID_Relato)")
@@ -130,15 +130,18 @@ def Cadastrar():
    MenuPrincipal()
 """
 
-"""
+
+
 #FUNÇÃO DA TABELA
 def MenuPrincipal():
+   # INICIALIZAÇÃO DE VARIÁVEIS
+   tabela = "0"
+
    while True:
-      try:
          print("------------------------------------\n")
          print("########## MENU PRINCIPAL ##########")
-         print("1 - MOSTRAR TABELAS\n2 - INSERIR DADOS NA TABELA\n3 - PESQUISAR\n4 - SAIR\n")
-         numero = input("O que deseja?\n")
+         print("1 - MOSTRAR TABELAS\n2 - INSERIR DADOS NA TABELA\n3 - ATUALIZAR DADOS\n4 - PESQUISAR DADOS\n5 - SAIR\n")
+         numero = input("O que deseja?\n>")
 
          #MOSTRAR TABELAS
          if (numero == '1'):
@@ -146,81 +149,332 @@ def MenuPrincipal():
             for x in cursor:  # O for faz uma varredura no comando do input e printa o que resgatou
                print(x)
 
-         #cadeia de if para INSERÇÃO DE DADOS
-         elif (numero == '2'):
-            print("1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4\
-             - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n7 - MIDIA\n")
-            tabela = input('Qual TABELA deseja INSERIR DADOS?\n')
-            if tabela == '1':
-               a = input("Descrição:")
-               b = input("Data: (DD/MM/AA)")
-               c = input("Status: (PENDENTE, PUBLICADO, DESATIVADO OU RESOLVIDO)")
-               sql = "INSERT INTO RELATO(descricao, data, status) VALUES(%a, %a, %a)"
-               val = (a, b, c)
-               cursor.execute(sql % val)
-               mydb.commit()
-               cursor.execute("select * from relato")
-               for x in cursor:
-                  print(x)
-            elif tabela == '2':
-               a = input("Nome:")
-               b = input("Data de Nascimento: (DD/MM/AA)")
-               c = input("Telefone: (xx)9xxxx-xxxx")
-               d = input("E-Mail:")
-               e = input("Senha:")
-               sql = "INSERT INTO CIDADAO(nome, data_nascimento, telefone, email, senha) VALUES(%a, %a, %a, %a, %a)"
-               val = (a,b,c,d,e)
-               cursor.execute(sql % val)
-               mydb.commit()
-            elif tabela == '3':
-               a = input("Nome:")
-               b = input("Órgão/Empresa: ")
-               c = input("E-Mail Institucional:")
-               d = input("Senha:")
-               sql = "INSERT INTO FUNCIONARIO_PUBLICO(nome, orgao_empresa, email_institucional, senha) VALUES(%a, %a, %a, %a)"
-               val = (a,b,c,d)
-               cursor.execute(sql % val)
-               mydb.commit()
-            elif tabela == '4':
-               a = input("CEP: (xxxxx-xxx)")
-               b = input("Cidade: ")
-               c = input("Bairro:")
-               d = input("Rua:")
-               e = input("Número:")
-               sql = "INSERT INTO ENDERECO(cep, cidade, bairro, rua, numero) VALUES(%s, %a, %a, %a, %a, %a)"
-               val = (a,b,c,d,e,)
-               cursor.execute(sql % val)
-               mydb.commit()
-            elif tabela == '5':
-               a = input("CEP: (xxxxx-xxx)")
-               b = input("Cidade: ")
-               sql = "INSERT INTO PROBLEMA(categoria, subcategoria) VALUES(%a, %a)"
-               val = (a,b)
-               cursor.execute(sql % val)
-               mydb.commit()
-            elif tabela == '6':
-               a = input("Rua:")
-               b = input("Bairro:")
-               c = input("Cidade:")
-               d = input("CEP: (xxxxx-xxx)")
-               sql = "INSERT INTO LOCALIZACAO(rua, bairro, cidade, cep)"
-               val = (a,b,c,d)
-               cursor.execute(sql % val)
-               mydb.commit()
-                
-            print(cursor.rowcount,"Dado(s) INSERIDO(s)!")
+            print("\n1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4 - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n7 - MIDIA\n")
+            tabela = input("Deseja visualizar todos os dados de alguma tabela?\nSe sim, digite o número dela\nSe não, digite '-1'\n>")
 
+            while tabela != '-1':
+               if tabela == '1':
+                  print("") #Quebra de linha
+                  cursor.execute("select * from relato")
+                  for x in cursor:
+                     print(x)
+               if tabela == '2':
+                  print("")  # Quebra de linha
+                  cursor.execute("select * from cidadao")
+                  for x in cursor:
+                     print(x)
+               if tabela == '3':
+                  print("")  # Quebra de linha
+                  cursor.execute("select * from funcionario_publico")
+                  for x in cursor:
+                     print(x)
+               if tabela == '4':
+                  print("")  # Quebra de linha
+                  cursor.execute("select * from endereco")
+                  for x in cursor:
+                     print(x)
+               if tabela == '5':
+                  print("")  # Quebra de linha
+                  cursor.execute("select * from problema")
+                  for x in cursor:
+                     print(x)
+               if tabela == '6':
+                  print("")  # Quebra de linha
+                  cursor.execute("select * from localizacao")
+                  for x in cursor:
+                     print(x)
+
+               print("")  # Quebra de linha
+               print("1 - RELATO 2 - CIDADÃO 3 - FUNCIONÁRIO PÚBLICO 4 - ENDEREÇO 5 - PROBLEMA 6 - LOCALIZAÇÃO 7 - MIDIA")
+               tabela = input("Deseja visualizar alguma outra tabela?\nSe sim, digite o número dela\nSe não, digite '-1'\n>")
+
+         #INSERIR DE DADOS
+         elif (numero == '2'):
+            print("------------------------------------\n")
+            print("########## INSERÇÃO DE DADOS ##########")
+            print("1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4 - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n7 - MIDIA\n")
+            tabela = input('Qual TABELA deseja INSERIR DADOS?\n>')
+            while tabela != '-1':
+               if tabela == '1':
+                  a = input("Descrição: ")
+                  b = datetime.datetime.now().isoformat()
+                  c = input("Status: (PENDENTE, PUBLICADO, EM ANDAMENTO, DESATIVADO OU RESOLVIDO)\n>")
+                  sql = "INSERT INTO RELATO(descricao, data, status) VALUES(%a, %a, %a)"
+                  val = (a, b, c)
+                  cursor.execute(sql % val)
+                  mydb.commit()
+                  cursor.execute("select * from relato")
+                  for x in cursor:
+                     print(x)
+               elif tabela == '2':
+                  a = input("Nome: ")
+                  b1 = int(input("Data de Nascimento (DIA): "))
+                  b2 = int(input("Data de Nascimento (MÊS): "))
+                  b3 = int(input("Data de Nascimento (ANO): "))
+                  b = datetime.date(b3, b2, b1).isoformat()
+                  c = input("Telefone: (xx)9xxxx-xxxx\n>")
+                  d = input("E-Mail: ")
+                  e = input("Senha: ")
+                  sql = "INSERT INTO CIDADAO(nome, data_nascimento, telefone, email, senha) VALUES(%a, %a, %a, %a, %a)"
+                  val = (a,b,c,d,e)
+                  cursor.execute(sql % val)
+                  mydb.commit()
+                  cursor.execute("select * from cidadao")
+                  for x in cursor:
+                     print(x)
+               elif tabela == '3':
+                  a = input("Nome: ")
+                  b = input("Órgão/Empresa: ")
+                  c = input("E-Mail Institucional: ")
+                  d = input("Senha: ")
+                  sql = "INSERT INTO FUNCIONARIO_PUBLICO(nome, orgao_empresa, email_institucional, senha) VALUES(%a, %a, %a, %a)"
+                  val = (a,b,c,d)
+                  cursor.execute(sql % val)
+                  mydb.commit()
+                  cursor.execute("select * from funcionario_publico")
+                  for x in cursor:
+                     print(x)
+               elif tabela == '4':
+                  a = input("CEP: (xxxxx-xxx)\n>")
+                  b = input("Cidade: ")
+                  c = input("Bairro: ")
+                  d = input("Rua: ")
+                  e = input("Número: ")
+                  sql = "INSERT INTO ENDERECO(cep, cidade, bairro, rua, numero) VALUES(%s, %a, %a, %a, %a, %a)"
+                  val = (a,b,c,d,e,)
+                  cursor.execute(sql % val)
+                  mydb.commit()
+                  cursor.execute("select * from endereco")
+                  for x in cursor:
+                     print(x)
+               elif tabela == '5':
+                  a = input("Categoria: ")
+                  b = input("Subcategoria: ")
+                  sql = "INSERT INTO PROBLEMA(categoria, subcategoria) VALUES(%a, %a)"
+                  val = (a,b)
+                  cursor.execute(sql % val)
+                  mydb.commit()
+                  cursor.execute("select * from problema")
+                  for x in cursor:
+                     print(x)
+               elif tabela == '6':
+                  a = input("Rua: ")
+                  b = input("Bairro: ")
+                  c = input("Cidade: ")
+                  d = input("CEP: (xxxxx-xxx)\n>")
+                  sql = "INSERT INTO LOCALIZACAO(rua, bairro, cidade, cep)"
+                  val = (a,b,c,d)
+                  cursor.execute(sql % val)
+                  mydb.commit()
+                  cursor.execute("select * from localizacao")
+                  for x in cursor:
+                     print(x)
+
+               print("")  # Quebra de linha
+               print(cursor.rowcount,"Dado(s) INSERIDO(s)!\n")
+               print(
+                  "1 - RELATO 2 - CIDADÃO 3 - FUNCIONÁRIO PÚBLICO 4 - ENDEREÇO 5 - PROBLEMA 6 - LOCALIZAÇÃO 7 - MIDIA")
+               tabela = input("Deseja inserir mais dados?\nSe sim, digite o número da tabela\nSe não, digite '-1'\n>")
+
+         #ATUALIZAR DADOS
          elif (numero == '3'):
-            tabela = input('Em qual TABELA deseja PESQUISAR?\n')
+            print("")
+
+         #PESQUISAR DADOS
          elif (numero == '4'):
+            print("------------------------------------\n")
+            print("########## PESQUISA DE DADOS ##########")
+            print("1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4 - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n7 - MIDIA\n")
+            tabela = input('Em qual TABELA deseja PESQUISAR?\n>')
+            while tabela != '-1':
+               if tabela == '1':
+                  print("Colunas na TABELA RELATO")
+                  cursor.execute("describe relato")
+                  for x in cursor:
+                     print(x)
+
+                  coluna = input("Coluna que deseja pesquisar: ")
+                  pesq = input("O que deseja pesquisar: ")
+                  posicao = input("Deseja que sua pesquisa esteja no começo (1), meio (2), ou fim (3) do registo?\n>")
+
+                  if posicao == '1':
+                     sql = "SELECT * FROM RELATO WHERE %s LIKE '%s'"
+                     val = (coluna, pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '2':
+                     sql = "SELECT * FROM RELATO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '3':
+                     sql = "SELECT * FROM RELATO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq,)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  print("")
+
+               elif tabela == '2':
+                  print("Colunas na TABELA CIDADAO")
+                  cursor.execute("describe cidadao")
+                  for x in cursor:
+                     print(x)
+
+                  coluna = input("Coluna que deseja pesquisar: ")
+                  pesq = input("O que deseja pesquisar: ")
+                  posicao = input("Deseja que sua pesquisa esteja no começo (1), meio (2), ou fim (3) do registo?\n>")
+
+                  if posicao == '1':
+                     sql = "SELECT * FROM CIDADAO WHERE %s LIKE '%s'"
+                     val = (coluna, pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '2':
+                     sql = "SELECT * FROM CIDADAO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '3':
+                     sql = "SELECT * FROM CIDADAO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq,)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  print("")
+
+               elif tabela == '3':
+                  print("Colunas na TABELA FUNCIONÁRIO PÚBLICO")
+                  cursor.execute("describe funcionario_publico")
+                  for x in cursor:
+                     print(x)
+
+                  coluna = input("Coluna que deseja pesquisar: ")
+                  pesq = input("O que deseja pesquisar: ")
+                  posicao = input("Deseja que sua pesquisa esteja no começo (1), meio (2), ou fim (3) do registo?\n>")
+
+                  if posicao == '1':
+                     sql = "SELECT * FROM FUNCIONARIO_PUBLICO WHERE %s LIKE '%s'"
+                     val = (coluna, pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '2':
+                     sql = "SELECT * FROM FUNCIONARIO_PUBLICO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '3':
+                     sql = "SELECT * FROM FUNCIONARIO_PUBLICO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq,)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  print("")
+               elif tabela == '4':
+                  print("Colunas na TABELA ENDEREÇO")
+                  cursor.execute("describe endereco")
+                  for x in cursor:
+                     print(x)
+
+                  coluna = input("Coluna que deseja pesquisar: ")
+                  pesq = input("O que deseja pesquisar: ")
+                  posicao = input("Deseja que sua pesquisa esteja no começo (1), meio (2), ou fim (3) do registo?\n>")
+
+                  if posicao == '1':
+                     sql = "SELECT * FROM ENDERECO WHERE %s LIKE '%s'"
+                     val = (coluna, pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '2':
+                     sql = "SELECT * FROM ENDERECO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '3':
+                     sql = "SELECT * FROM ENDERECO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq,)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  print("")
+               elif tabela == '5':
+                  print("Colunas na TABELA PROBLEMA")
+                  cursor.execute("describe problema")
+                  for x in cursor:
+                     print(x)
+
+                  coluna = input("Coluna que deseja pesquisar: ")
+                  pesq = input("O que deseja pesquisar: ")
+                  posicao = input("Deseja que sua pesquisa esteja no começo (1), meio (2), ou fim (3) do registo?\n>")
+
+                  if posicao == '1':
+                     sql = "SELECT * FROM PROBLEMA WHERE %s LIKE '%s'"
+                     val = (coluna, pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '2':
+                     sql = "SELECT * FROM PROBLEMA WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '3':
+                     sql = "SELECT * FROM PROBLEMA WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq,)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  print("")
+               elif tabela == '6':
+                  print("Colunas na TABELA LOCALIZAÇÃO")
+                  cursor.execute("describe localizacao")
+                  for x in cursor:
+                     print(x)
+
+                  coluna = input("Coluna que deseja pesquisar: ")
+                  pesq = input("O que deseja pesquisar: ")
+                  posicao = input("Deseja que sua pesquisa esteja no começo (1), meio (2), ou fim (3) do registo?\n>")
+
+                  if posicao == '1':
+                     sql = "SELECT * FROM LOCALIZACAO WHERE %s LIKE '%s'"
+                     val = (coluna, pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '2':
+                     sql = "SELECT * FROM LOCALIZACAOELATO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq + "%",)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  elif posicao == '3':
+                     sql = "SELECT * FROM LOCALIZACAO WHERE %s LIKE '%s'"
+                     val = (coluna, "%" + pesq,)
+                     cursor.execute(sql % val)
+                     for x in cursor:
+                        print(x)
+                  print("")
+               print("") #Quebra de linha
+               print("1 - RELATO 2 - CIDADÃO 3 - FUNCIONÁRIO PÚBLICO 4 - ENDEREÇO5 - PROBLEMA 6 - LOCALIZAÇÃO")
+               tabela = input("Deseja realizar outra pesquisa?\nSe sim, digite o número da tabela\nSe não, digite '-1'\n>")
+
+         elif (numero == '5'):
             break
+         print("------------------------------------")
          MenuPrincipal()
-      except:
-         pass
-"""
+
 
 #Como o DATETIME funciona
-a = datetime.datetime.now().isoformat()
+"""a = datetime.datetime.now().isoformat()
 print(a)
 sql = "INSERT INTO RELATO(data) VALUES(%a)"
 
@@ -229,12 +483,22 @@ cursor.execute(sql % val)
 mydb.commit()
 cursor.execute("select * from relato")
 for x in cursor:
+   print(x)"""
+
+#Esta é a forma como se deve formatar a função de PESQUISA em Python
+"""
+a = input("")
+b = input("")
+sql = "SELECT * FROM RELATO WHERE %s LIKE '%s'"
+val = (a, "%" + b + "%",)
+print(sql % val)
+cursor.execute(sql % val)
+for x in cursor:
    print(x)
-
-
+"""
 #ORDEM DE MENUS
 #MenuLogin()
-#MenuPrincipal()
+MenuPrincipal()
 
 """
 #Aqui está a INTERAÇÃO COM O USUÁRIO
