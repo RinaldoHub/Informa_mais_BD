@@ -8,7 +8,7 @@ mydb = mysql.connector.connect(
    host = "localhost",
    user = "root",
    password = "",
-   database = ""
+   database = "cadastro"
 )
 #O cursor precisa ser criado para que possamos executar os códigos SQL no Python
 #Lembra bastante os Objetos em Java.
@@ -24,50 +24,108 @@ if mydb.database == 'None':
 #TELA DE INTRODUÇÃO e decoração pro código
 print("########## BEM-VINDO(A) AO INFORMA+ ##########\nPara sair, digite -1\n")
 print("BANCO DE DADOS ATIVO: %s\nUSUÁRIO: %s\n" % (mydb.database, mydb.user))
-"""
-#TELA PRINCIPAL
+
+#TELA INICIAL
 def MenuLogin():
-   print("------------------------------------\n")
-   print("########## TELA PRINCIPAL ##########")
-   print("1 - LOGIN\n2 - CADASTRAR\n")
-   numero = input("O que deseja?\n")
+   numero = '0'
+   while numero != '4':
+      print("------------------------------------\n")
+      print("########## TELA PRINCIPAL ##########")
+      print("[1] - Cidadão\n[2] - Funcionário\n[3] - TESTAR FUNÇÕES\n[4] - Sair")
+      numero = input("Quem você é?\n>")
 
-   if(numero == '1'):
-      Login()
+      #CIDADÃO
+      if(numero == '1'):
+         numero = input("O que deseja?\n[1] - LOGIN\n[2] - CADASTRAR\n>")
+         if numero == '1': LoginCid()
+         elif numero == '2': CadastrarCid()
 
-   elif(numero == '2'):
-      Cadastrar()
+      #FUNCIONÁRIO PÚBLICO
+      elif(numero == '2'):
+         numero = input("O que deseja?\n[1] - LOGIN\n[2] - CADASTRAR")
 
-   #elif(numero == '3'): break
+         if numero == '1': LoginFunc()
+         elif numero == '2':CadastrarFunc()
 
-   elif(numero != 1 or 2 or 3):
-      print("ESCOLHA UMA OPÇÃO VÁLIDA")
+      #TESTADOR
+      elif(numero == '3'):
+         MenuPrincipal()
 
-def Login():
+      #SAIR DO APLICATIVO
+      elif(numero == '4'):
+         print("########## APLICATIVO ENCERRADO ##########")
+      break
+
+def LoginCid():
    print("------------------------------------\n")
    print("########## TELA DE LOGIN ##########")
-   user = input("Digite seu Username:")
+   email = input("Digite seu E-Mail:")
    senha = input("Digite sua Senha: ")
-   print("ACESSO AUTORIZADO")
+   print("ACESSO AUTORIZADO\n------------------------------------")
    MenuPrincipal()
 
-def Cadastrar():
+#Cadastro do cidadão
+def CadastrarCid():
    print("------------------------------------\n")
    print("########## TELA DE CADASTRO ##########")
-   user = input("Digite seu Username:")
-   senha = input("Digite sua Senha: ")
-   print("ACESSO AUTORIZADO")
+   print("---------- DADOS PESSOAIS ----------")
+
+   #Primeiro os dados pessoais
+   a = input("Nome: ")
+   b1 = int(input("Data de Nascimento (DIA): "))
+   b2 = int(input("Data de Nascimento (MÊS): "))
+   b3 = int(input("Data de Nascimento (ANO): "))
+   b = datetime.date(b3, b2, b1).isoformat()
+   c = input("Telefone: (xx)9xxxx-xxxx\n>")
+   d = input("E-Mail: ")
+   e = input("Senha: ")
+   sql = "INSERT INTO CIDADAO(nome, data_nascimento, telefone, email, senha) VALUES(%a, %a, %a, %a, %a)"
+   val = (a, b, c, d, e)
+   cursor.execute(sql % val)
+   mydb.commit()
+
+   #Depois o Endereço
+   print("---------- ENDEREÇO ----------")
+   a = input("CEP: (xxxxx-xxx)\n>")
+   b = input("Cidade: ")
+   c = input("Bairro: ")
+   d = input("Rua: ")
+   e = input("Número: ")
+   sql = "INSERT INTO ENDERECO(cep, cidade, bairro, rua, numero) VALUES(%s, %a, %a, %a, %a, %a)"
+   val = (a, b, c, d, e,)
+   cursor.execute(sql % val)
+   mydb.commit()
+   print("ACESSO AUTORIZADO\n------------------------------------")
+   MenuCid()
+
+def LoginFunc():
+   print("------------------------------------\n")
+   print("########## TELA DE LOGIN ##########")
+   emailFunc = input("E-Mail Institucional: ")
+   senhaFunc = input("Senha: ")
+   print("ACESSO AUTORIZADO\n------------------------------------")
    MenuPrincipal()
-"""
 
+def CadastrarFunc():
+   print("------------------------------------\n")
+   print("########## TELA DE CADASTRO ##########")
+   a = input("Nome: ")
+   b = input("Órgão/Empresa: ")
+   c = input("E-Mail Institucional: ")
+   d = input("Senha: ")
+   sql = "INSERT INTO FUNCIONARIO_PUBLICO(nome, orgao_empresa, email_institucional, senha) VALUES(%a, %a, %a, %a)"
+   val = (a, b, c, d)
+   cursor.execute(sql % val)
+   mydb.commit()
+   print("ACESSO AUTORIZADO\n------------------------------------")
+   #MenuFunc()
 
-
-#FUNÇÃO DA TABELA
+#FUNÇÃO DO TESTADOR contendo todas as funções do banco (exceto DELETE)
 def MenuPrincipal():
    while True:
          print("------------------------------------\n")
          print("########## MENU PRINCIPAL ##########")
-         print("1 - MOSTRAR TABELAS\n2 - INSERIR DADOS NA TABELA\n3 - ATUALIZAR DADOS\n4 - PESQUISAR DADOS\n5 - SAIR\n")
+         print("[1] - MOSTRAR TABELAS\n[2] - INSERIR DADOS NA TABELA\n[3] - ATUALIZAR DADOS\n[4] - PESQUISAR DADOS\n[5] - DELETAR TUPLA\n[6] - SAIR\n")
          numero = input("O que deseja?\n>")
 
          #MOSTRAR TABELAS
@@ -119,7 +177,7 @@ def MenuPrincipal():
          elif (numero == '2'):
             print("------------------------------------\n")
             print("########## INSERÇÃO DE DADOS ##########")
-            print("1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4 - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n7 - MIDIA\n")
+            print("1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4 - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n")
             tabela = input('Qual TABELA deseja INSERIR DADOS?\n>')
             while tabela != '-1':
                if tabela == '1':
@@ -531,12 +589,171 @@ def MenuPrincipal():
                print("1 - RELATO 2 - CIDADÃO 3 - FUNCIONÁRIO PÚBLICO 4 - ENDEREÇO5 - PROBLEMA 6 - LOCALIZAÇÃO")
                tabela = input("Deseja realizar outra pesquisa?\nSe sim, digite o número da tabela\nSe não, digite '-1'\n>")
 
-         #Fechar CONSOLE
+         #DELETAR TUPLA
          elif (numero == '5'):
+            print("------------------------------------\n")
+            print(
+               "1 - RELATO\n2 - CIDADÃO\n3 - FUNCIONÁRIO PÚBLICO\n4 - ENDEREÇO\n5 - PROBLEMA\n6 - LOCALIZAÇÃO\n7 - MIDIA\n")
+            print("########## DELETAR TUPLA ##########")
+            tabela = input('Em qual TABELA deseja DELETAR uma TUPLA?\n>')
+            while tabela != '-1':
+               if tabela == '1':
+                  #Primeiro mostra todas TUPLAS da TABELA
+                  print("") #Quebra de linha
+                  cursor.execute("select * from relato")
+                  for x in cursor:
+                     print(x)
+                  print("")  # Quebra de linha
+
+                  #Depois pede que TUPLA deseja DELETAR
+                  a = input("ID da TUPLA que deseja DELETAR: ")
+                  sql = "DELETE FROM relato WHERE ID_relato LIKE '%s'"
+                  val = (a)
+                  cursor.execute(sql % val)
+                  mydb.commit() #Sempre commitar depois de codigos DML
+                  cursor.execute("select * from relato")
+                  for x in cursor:
+                     print(x)
+
+               elif tabela == '2':
+                  print("")  # Quebra de linha
+                  # Primeiro mostra todas TUPLAS da TABELA
+                  cursor.execute("select * from cidadao")
+                  for x in cursor:
+                     print(x)
+                  print("")  # Quebra de linha
+
+                  # Depois pede que TUPLA deseja DELETAR
+                  a = input("ID da TUPLA que deseja DELETAR: ")
+                  sql = "DELETE FROM cidadao WHERE ID_cidadao LIKE '%s'"
+                  val = (a)
+                  cursor.execute(sql % val)
+                  mydb.commit() #Sempre commitar depois de codigos DML
+                  cursor.execute("select * from cidadao")
+                  for x in cursor:
+                     print(x)
+
+               elif tabela == '3':
+                  print("")  # Quebra de linha
+                  # Primeiro mostra todas TUPLAS da TABELA
+                  cursor.execute("select * from funcionario_publico")
+                  for x in cursor:
+                     print(x)
+                  print("")  # Quebra de linha
+
+                  # Depois pede que TUPLA deseja DELETAR
+                  a = input("ID da TUPLA que deseja DELETAR: ")
+                  sql = "DELETE FROM funcionario WHERE ID_funcionario LIKE '%s'"
+                  val = (a)
+                  cursor.execute(sql % val)
+                  mydb.commit() #Sempre commitar depois de codigos DML
+                  cursor.execute("select * from funcionario_publico")
+                  for x in cursor:
+                     print(x)
+
+               elif tabela == '4':
+                  print("")  # Quebra de linha
+                  # Primeiro mostra todas TUPLAS da TABELA
+                  cursor.execute("select * from endereco")
+                  for x in cursor:
+                     print(x)
+                  print("")  # Quebra de linha
+
+                  # Depois pede que TUPLA deseja DELETAR
+                  a = input("ID da TUPLA que deseja DELETAR: ")
+                  sql = "DELETE FROM endereco WHERE ID_endereco LIKE '%s'"
+                  val = (a)
+                  cursor.execute(sql % val)
+                  mydb.commit() #Sempre commitar depois de codigos DML
+                  cursor.execute("select * from endereco")
+                  for x in cursor:
+                     print(x)
+
+               elif tabela == '5':
+                  print("")  # Quebra de linha
+                  # Primeiro mostra todas TUPLAS da TABELA
+                  cursor.execute("select * from problema")
+                  for x in cursor:
+                     print(x)
+                  print("")  # Quebra de linha
+
+                  # Depois pede que TUPLA deseja DELETAR
+                  a = input("ID da TUPLA que deseja DELETAR: ")
+                  sql = "DELETE FROM problema WHERE ID_problema LIKE '%s'"
+                  val = (a)
+                  cursor.execute(sql % val)
+                  mydb.commit() #Sempre commitar depois de codigos DML
+                  cursor.execute("select * from problema")
+                  for x in cursor:
+                     print(x)
+
+               elif tabela == '6':
+                  print("")  # Quebra de linha
+                  # Primeiro mostra todas TUPLAS da TABELA
+                  cursor.execute("select * from localizacao")
+                  for x in cursor:
+                     print(x)
+
+                  # Depois pede que TUPLA deseja DELETAR
+                  a = input("ID da TUPLA que deseja DELETAR: ")
+                  sql = "DELETE FROM localizacao WHERE ID_localizacao LIKE '%s'"
+                  val = (a)
+                  cursor.execute(sql % val)
+                  mydb.commit() #Sempre commitar depois de codigos DML
+                  cursor.execute("select * from localizacao")
+                  for x in cursor:
+                     print(x)
+
+               print(cursor.rowcount,"Registro(s) DELETADO(s)!\n")
+               print("1 - RELATO 2 - CIDADÃO 3 - FUNCIONÁRIO PÚBLICO 4 - ENDEREÇO5 - PROBLEMA 6 - LOCALIZAÇÃO")
+               tabela = input(
+                  "Deseja realizar outro DELETE?\nSe sim, digite o número da tabela\nSe não, digite '-1'\n>")
+
+         #Fechar CONSOLE
+         elif (numero == '6'):
             print("########## APLICATIVO ENCERRADO ##########")
             break
          print("------------------------------------")
          MenuPrincipal()
+
+#FUNÇÃO DO CIDADÃO contendo funções específicas para tal usuário
+def MenuCid():
+   print("------------------------------------\n")
+   print("########## MENU PRINCIPAL ##########")
+   print("[1] - RELATAR PROBLEMA\n[2] - LISTAR RELATOS\n[3] - EXCLUIR RELATO\n4 - SAIR\n")
+   numero = input("O que deseja?\n>")
+
+   #RELATAR PROBLEMA
+   if numero == '1':
+      #INSERIR PROBLEMA
+      a = input("Categoria: ")
+      b = input("Subcategoria: ")
+      sql = "INSERT INTO PROBLEMA(categoria, subcategoria) VALUES(%a, %a)"
+      val = (a, b)
+      cursor.execute(sql % val)
+      mydb.commit()
+
+      #INSERIR RELATO do problema
+      a = input("Descrição: ")
+      b = datetime.datetime.now().isoformat()
+      c = input("Status: (PENDENTE, PUBLICADO, EM ANDAMENTO, DESATIVADO OU RESOLVIDO)\n>")
+      sql = "INSERT INTO RELATO(descricao, data, status) VALUES(%a, %a, %a)"
+      val = (a, b, c)
+      cursor.execute(sql % val)
+      mydb.commit()
+
+      #INSERIR LOCALIZAÇÃO do problema
+      a = input("Rua: ")
+      b = input("Bairro: ")
+      c = input("Cidade: ")
+      d = input("CEP: (xxxxx-xxx)\n>")
+      sql = "INSERT INTO LOCALIZACAO(rua, bairro, cidade, cep)"
+      val = (a, b, c, d)
+      cursor.execute(sql % val)
+      mydb.commit()
+
+#FUNÇÃO DO FUNCIONÁRIO PÚBLICO contendo funções específicas para tal usuário
+#def MenuFunc:
 
 #ORDEM DE MENUS
 #MenuLogin()
