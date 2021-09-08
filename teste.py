@@ -1,68 +1,86 @@
 import mysql.connector #Importamos o concector MySQL que implementa o Banco
-
 import datetime
 
 
 #Aqui vai as credenciais do nosso banco. Serve para realizar a conexão do plugin do python com o BD
+#PRIMEIRAMENTE, FAZEMOS A CONEXÃO SEM NENHUM BANCO DE DADOS
 mydb = mysql.connector.connect(
    host = "localhost",
    user = "root",
    password = "",
-   database = "cadastro"
+   database = ""
 )
-#O cursor precisa ser criado para que possamos executar os códigos SQL no Python
-#Lembra bastante os Objetos em Java.
-cursor = mydb.cursor(prepared=True)
-
-#Aqui o Python irá abrir o arquivo .sql com os comandos DDL para criação do nosso banco
-if mydb.database == 'None':
-   f = open("informa_mais.sql", "r")
-   for x in f:
-      cursor.execute(f)
-   f.close()
 
 #TELA DE INTRODUÇÃO e decoração pro código
 print("########## BEM-VINDO(A) AO INFORMA+ ##########\nPara sair, digite -1\n")
 print("BANCO DE DADOS ATIVO: %s\nUSUÁRIO: %s\n" % (mydb.database, mydb.user))
 
+#O cursor precisa ser criado para que possamos executar os códigos SQL no Python
+#Lembra bastante os Objetos em Java.
+cursor = mydb.cursor(prepared=True)
+
+
+#Aqui o Python irá abrir o arquivo .sql com os comandos DDL para criação do nosso banco
+#E DEPOIS, LEMOS AS DUAS PRIMEIRAS LINHAS DO ARQUIVO.SQL QUE DROPA O BANCO CASO EXISTA E CRIA UM NOVO
+f = open("informa_mais.sql", "r")
+cursor.execute(f.readline())
+cursor.execute(f.readline())
+
+#POR ÚLTIMO FAZEMOS UMA NOVA CONEXÃO COM O BANCO JÁ CRIADO E USANDO-O
+mydb = mysql.connector.connect(
+   host = "localhost",
+   user = "root",
+   password = "",
+   database = "informa_mais"
+)
+
+cursor = mydb.cursor(prepared=True)
+
+#E FINALIZAMOS A EXECUÇÃO DOS COMANDOS DDL DE TABELAS E FKs DO ARQUIVO
+for x in f:
+    cursor.execute(x)
+f.close()
+
 #TELA INICIAL
 def MenuLogin():
-   numero = '0'
-   while numero != '4':
-      print("------------------------------------\n")
-      print("########## TELA PRINCIPAL ##########")
-      print("[1] - Cidadão\n[2] - Funcionário\n[3] - TESTAR FUNÇÕES\n[4] - Sair")
-      numero = input("Quem você é?\n>")
+   print("------------------------------------\n")
+   print("########## TELA PRINCIPAL ##########")
+   print("[1] - Cidadão\n[2] - Funcionário\n[3] - TESTAR FUNÇÕES\n[4] - Sair")
+   numero = input("Quem você é?\n>")
 
-      #CIDADÃO
-      if(numero == '1'):
-         numero = input("O que deseja?\n[1] - LOGIN\n[2] - CADASTRAR\n>")
-         if numero == '1': LoginCid()
-         elif numero == '2': CadastrarCid()
+   #CIDADÃO
+   if(numero == '1'):
+      numero = input("\nO que deseja?\n[1] - LOGIN\n[2] - CADASTRAR\n>")
+      print("") #Quebra de linha
 
-      #FUNCIONÁRIO PÚBLICO
-      elif(numero == '2'):
-         numero = input("O que deseja?\n[1] - LOGIN\n[2] - CADASTRAR")
+      if numero == '1': LoginCid()
+      elif numero == '2': CadastrarCid()
 
-         if numero == '1': LoginFunc()
-         elif numero == '2':CadastrarFunc()
+   #FUNCIONÁRIO PÚBLICO
+   elif(numero == '2'):
+      numero = input("\nO que deseja?\n[1] - LOGIN\n[2] - CADASTRAR")
+      print("")  # Quebra de linha
 
-      #TESTADOR
-      elif(numero == '3'):
-         MenuPrincipal()
+      if numero == '1': LoginFunc()
+      elif numero == '2':CadastrarFunc()
 
-      #SAIR DO APLICATIVO
-      elif(numero == '4'):
-         print("########## APLICATIVO ENCERRADO ##########")
-      break
+   #TESTADOR
+   elif(numero == '3'):
+      MenuPrincipal()
 
+   #SAIR DO APLICATIVO
+   elif(numero == '4'):
+      print("########## APLICATIVO ENCERRADO ##########")
+   exit()
+
+#TELA DE LOGIN DO CIDADÃO
 def LoginCid():
    print("------------------------------------\n")
    print("########## TELA DE LOGIN ##########")
-   email = input("Digite seu E-Mail:")
+   email = input("Digite seu E-Mail: ")
    senha = input("Digite sua Senha: ")
-   print("ACESSO AUTORIZADO\n------------------------------------")
-   MenuPrincipal()
+   print("\nACESSO AUTORIZADO\n------------------------------------")
+   MenuCid()
 
 #Cadastro do cidadão
 def CadastrarCid():
@@ -98,6 +116,7 @@ def CadastrarCid():
    print("ACESSO AUTORIZADO\n------------------------------------")
    MenuCid()
 
+#TELA DE LOGIN DO FUNCIONÁRIO
 def LoginFunc():
    print("------------------------------------\n")
    print("########## TELA DE LOGIN ##########")
@@ -106,6 +125,7 @@ def LoginFunc():
    print("ACESSO AUTORIZADO\n------------------------------------")
    MenuPrincipal()
 
+#TELA DE CADASTRO DO FUNCIONÁRIO
 def CadastrarFunc():
    print("------------------------------------\n")
    print("########## TELA DE CADASTRO ##########")
@@ -120,10 +140,10 @@ def CadastrarFunc():
    print("ACESSO AUTORIZADO\n------------------------------------")
    #MenuFunc()
 
-#FUNÇÃO DO TESTADOR contendo todas as funções do banco (exceto DELETE)
+#FUNÇÃO DO TESTADOR contendo todas as funções do banco
 def MenuPrincipal():
    while True:
-         print("------------------------------------\n")
+         print("------------ BEM-VINDO, TESTADOR ------------\n")
          print("########## MENU PRINCIPAL ##########")
          print("[1] - MOSTRAR TABELAS\n[2] - INSERIR DADOS NA TABELA\n[3] - ATUALIZAR DADOS\n[4] - PESQUISAR DADOS\n[5] - DELETAR TUPLA\n[6] - SAIR\n")
          numero = input("O que deseja?\n>")
@@ -711,16 +731,15 @@ def MenuPrincipal():
 
          #Fechar CONSOLE
          elif (numero == '6'):
-            print("########## APLICATIVO ENCERRADO ##########")
-            break
-         print("------------------------------------")
-         MenuPrincipal()
+            print("########## FAZENDO LOG OFF ##########")
+            print("------------------------------------")
+            MenuLogin()
 
 #FUNÇÃO DO CIDADÃO contendo funções específicas para tal usuário
 def MenuCid():
    print("------------------------------------\n")
    print("########## MENU PRINCIPAL ##########")
-   print("[1] - RELATAR PROBLEMA\n[2] - LISTAR RELATOS\n[3] - EXCLUIR RELATO\n4 - SAIR\n")
+   print("[1] - RELATAR PROBLEMA\n[2] - LISTAR RELATOS\n[3] - EXCLUIR RELATO\n[4] - SAIR\n")
    numero = input("O que deseja?\n>")
 
    #RELATAR PROBLEMA
@@ -752,9 +771,94 @@ def MenuCid():
       cursor.execute(sql % val)
       mydb.commit()
 
-#FUNÇÃO DO FUNCIONÁRIO PÚBLICO contendo funções específicas para tal usuário
-#def MenuFunc:
+   #LISTAR RELATOS
+   if numero == '2':
+      #MOSTRAR OS RELATOS
+      print("")  # Quebra de linha
+      cursor.execute("select * from relato")
+      for x in cursor:
+         print(x)
+      #MOSTRAR PROBLEMAS DOS RELATOS
+      print("")  # Quebra de linha
+      cursor.execute("select * from problema")
+      for x in cursor:
+         print(x)
+      #MOSTRAR LOCALIZAÇÃO DOS RELATOS
+      print("")  # Quebra de linha
+      cursor.execute("select * from localizacao")
+      for x in cursor:
+         print(x)
 
-#ORDEM DE MENUS
-#MenuLogin()
-MenuPrincipal()
+   #EXCLUIR RELATOS
+   if numero == '3':
+      # Primeiro mostra todas TUPLAS da TABELA
+      print("")  # Quebra de linha
+      cursor.execute("select * from relato")
+      for x in cursor:
+         print(x)
+      print("")  # Quebra de linha
+
+      # Depois pede que TUPLA deseja DELETAR
+      a = input("ID da TUPLA que deseja DELETAR: ")
+      sql = "DELETE FROM relato WHERE ID_relato LIKE '%s'"
+      val = (a)
+      cursor.execute(sql % val)
+      mydb.commit()  # Sempre commitar depois de codigos DML
+      cursor.execute("select * from relato")
+      for x in cursor:
+         print(x)
+
+   #SAIR DO APLICATIVO
+   if numero =='4': exit()
+
+#FUNÇÃO DO FUNCIONÁRIO PÚBLICO contendo funções específicas para tal usuário
+def MenuFunc():
+   print("------------------------------------\n")
+   print("########## MENU PRINCIPAL ##########")
+   print("[1] - LISTAR RELATOS\n[2] - MARCAR RESOLUÇÃO\n[3] - SAIR\n")
+   numero = input("O que deseja?\n>")
+
+   # RELATAR PROBLEMA
+   if numero == '1':
+      # MOSTRAR OS RELATOS
+      print("")  # Quebra de linha
+      cursor.execute("select * from relato")
+      for x in cursor:
+         print(x)
+      # MOSTRAR PROBLEMAS DOS RELATOS
+      print("")  # Quebra de linha
+      cursor.execute("select * from problema")
+      for x in cursor:
+         print(x)
+      # MOSTRAR LOCALIZAÇÃO DOS RELATOS
+      print("")  # Quebra de linha
+      cursor.execute("select * from localizacao")
+      for x in cursor:
+         print(x)
+
+   # MARCAR RESOLUÇÃO
+   if numero == '2':
+      print("-------------------- RELATOS EM ANDAMENTO --------------------")
+      cursor.execute("select * from relato WHERE status = 'EM ANDAMENTO'")
+      for x in cursor:
+         print(x)
+      print("")  # Quebra de Linha
+      a = input("Digite a ID do RELATO que sofrerá a atualização: ")
+      sql = "UPDATE RELATO SET status = 'RESOLVIDO' WHERE ID_RELATO = '%s'"
+      val = (a)
+      cursor.execute(sql % val)
+      mydb.commit()
+
+      print("RELATO COM ID = '%s' MARCADO COMO 'RESOLVIDO'", a)
+      cursor.execute("SELECT * FROM RELATO WHERE ID_RELATO = '%s'" % a)
+      for x in cursor:
+         print(x)
+
+   # SAIR DO APLICATIVO
+   if numero == '3':
+      print("########## FAZENDO LOG OFF ##########")
+      print("------------------------------------")
+      MenuLogin()
+
+#INICIALIZAÇÃO DO APLICATIVO
+MenuLogin()
