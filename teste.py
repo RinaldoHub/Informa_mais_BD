@@ -43,6 +43,7 @@ f.close()
 
 # TELA INICIAL
 def MenuLogin():
+   try:
     print("------------------------------------\n")
     print("########## TELA PRINCIPAL ##########")
     print("[1] - Cidadão\n[2] - Funcionário\n[3] - TESTAR FUNÇÕES\n[4] - Sair")
@@ -76,6 +77,10 @@ def MenuLogin():
     elif (numero == '4'):
         print("########## APLICATIVO ENCERRADO ##########")
     exit()
+   except:
+      print("##### ALGO DEU ERRADO #####\n##### Chame Roque #####")
+      pass
+      MenuLogin()
 
 
 # TELA DE LOGIN DO CIDADÃO
@@ -90,6 +95,7 @@ def LoginCid():
 
 # Cadastro do cidadão
 def CadastrarCid():
+   try:
     print("------------------------------------\n")
     print("########## TELA DE CADASTRO ##########")
     print("---------- DADOS PESSOAIS ----------")
@@ -127,6 +133,10 @@ def CadastrarCid():
     mydb.commit()'''
 
     MenuCid()
+   except:
+    print("##### ALGO DEU ERRADO #####\n##### Chame Roque #####")
+    pass
+    CadastrarCid()
 
 
 # TELA DE LOGIN DO FUNCIONÁRIO
@@ -141,6 +151,7 @@ def LoginFunc():
 
 # TELA DE CADASTRO DO FUNCIONÁRIO
 def CadastrarFunc():
+   try:
     print("------------------------------------\n")
     print("########## TELA DE CADASTRO ##########")
     a = input("Nome: ")
@@ -153,12 +164,16 @@ def CadastrarFunc():
     mydb.commit()
     print("ACESSO AUTORIZADO\n------------------------------------")
     MenuFunc()
+   except:
+      print("##### ALGO DEU ERRADO #####\n##### Chame Roque #####")
+      pass
+      CadastrarFunc()
 
 
 # FUNÇÃO DO TESTADOR contendo todas as funções do banco
 def MenuPrincipal():
+   try:
     while True:
-       try:
         print("------------ BEM-VINDO, TESTADOR ------------\n")
         print("########## MENU PRINCIPAL ##########")
         print(
@@ -752,9 +767,10 @@ def MenuPrincipal():
             print("########## FAZENDO LOG OFF ##########")
             print("------------------------------------")
             MenuLogin()
-       except:
-          print("##### ALGO DEU ERRADO #####\n##### Chame Roque #####")
-          pass
+   except:
+      print("##### ALGO DEU ERRADO #####\n##### Chame Roque #####")
+      pass
+      MenuPrincipal()
 
 
 # FUNÇÃO DO CIDADÃO contendo funções específicas para tal usuário
@@ -809,9 +825,9 @@ def MenuCid():
     if numero == '2':
         # MOSTRAR OS RELATOS
         print("")  # Quebra de linha
-        cursor.execute("select p.categoria, r.data, r.status, l.rua, r.descricao from relato as r inner join problema "
-                       "as p, localizacao as l, cidadao as c where r.status like 'PUBLICADO' or 'EM ANDAMENTO' order "
-                       "by p.categoria")
+        cursor.execute("select r.ID_relato, p.categoria, r.descricao, r.data, r.status, l.rua from relato as r inner "
+                       "join problema p on r.id_relato = p.ID_problema join localizacao as l on r.ID_relato = "
+                       "l.ID_localizacao order by p.categoria")
         for x in cursor:
             print(x)
 
@@ -844,10 +860,11 @@ def MenuCid():
     if numero == '4':
        print("\nFAZENDO LOGOFF...\n")
        MenuLogin()
-   
+
    except:
       print("##### ALGO DEU ERRADO #####\n##### Chame Roque #####")
       pass
+      MenuCid()
 
 
 # FUNÇÃO DO FUNCIONÁRIO PÚBLICO contendo funções específicas para tal usuário
@@ -858,12 +875,13 @@ def MenuFunc():
     print("[1] - LISTAR RELATOS\n[2] - MARCAR RESOLUÇÃO\n[3] - SAIR\n")
     numero = input("O que deseja?\n>")
 
-    # RELATAR PROBLEMA
+    # MOSTRAR RELATOS
     if numero == '1':
         # MOSTRAR OS RELATOS e seus detalhes de outras TABELAS
         print("")  # Quebra de linha
-        cursor.execute("select r.ID_relato, p.categoria, r.data, r.status, l.rua, r.descricao from relato as r inner join problema "
-                       "as p, localizacao as l, cidadao as c where l.id_localizacao = r.id_relato order by p.categoria")
+        cursor.execute("select r.ID_relato, p.categoria, r.descricao, r.data, r.status, l.rua from relato as r inner "
+                       "join problema p on r.id_relato = p.ID_problema join localizacao as l on r.ID_relato = "
+                       "l.ID_localizacao order by p.categoria")
         for x in cursor:
             print(x)
         MenuFunc()
@@ -903,10 +921,11 @@ def MenuFunc():
         print("########## FAZENDO LOG OFF ##########")
         print("------------------------------------")
         MenuLogin()
-        
+
    except:
       print("##### ALGO DEU ERRADO #####\n##### Chame Roque #####")
       pass
+      MenuFunc()
 
 
 # INICIALIZAÇÃO DO APLICATIVO
